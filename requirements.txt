@@ -1,0 +1,6 @@
+pandas
+streamlit
+langchain
+langchain-community
+langchain-groq
+langgraph
