@@ -13,9 +13,9 @@ import os
 from dotenv import load_dotenv
 
 
-logging.basicConfig(filename='logs/app.log', level=log_level)
+logging.basicConfig(filename='logs/app.log', level=logging.INFO)
 
-logging.info('Hello, logging!')
+logging.info('cargando modulo')
 
 load_dotenv()
 
@@ -100,7 +100,10 @@ def get_response(user_input):
     inputs = {"messages": [("user", user_input)]}
     response = agent_executor.invoke(inputs, config=config)
     for m in response["messages"]:
-            m.pretty_print()
+            print("print:",m)
+            logging.info(f"info: {m}")
+
+    
     message = response["messages"][-1]
     if isinstance(message,tuple):
         return(message[1])
