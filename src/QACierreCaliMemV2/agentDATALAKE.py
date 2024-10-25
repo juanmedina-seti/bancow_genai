@@ -3,14 +3,19 @@ import pandas as pd
 from langchain_groq  import ChatGroq
 from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
+import logging
 #from langchain_community.utilities.sql_database import SQLDatabase
 #from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
 
-from urllib.request import urlopen
 import requests
 import os
 
 from dotenv import load_dotenv
+
+
+logging.basicConfig(filename='logs/app.log', level=log_level)
+
+logging.info('Hello, logging!')
 
 load_dotenv()
 
@@ -94,8 +99,8 @@ agent_executor = create_react_agent(
 def get_response(user_input):
     inputs = {"messages": [("user", user_input)]}
     response = agent_executor.invoke(inputs, config=config)
-    #for m in response["messages"]:
-    #        m.pretty_print()
+    for m in response["messages"]:
+            m.pretty_print()
     message = response["messages"][-1]
     if isinstance(message,tuple):
         return(message[1])
