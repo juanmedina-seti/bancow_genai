@@ -1,5 +1,5 @@
 import streamlit as st
-
+import uuid
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.messages import AIMessage
 from dotenv import load_dotenv
@@ -14,6 +14,9 @@ from src.QACierreCaliMemV2.agentDATALAKE import get_response
 # Inicializar la memoria de chat
 if 'chat_memory' not in st.session_state:
     st.session_state.chat_memory = ChatMessageHistory()
+
+if "thread_id" not in st.session_state:
+    st.session_state["thread_id"] = str(uuid.uuid4())
 
 # Configuración de la aplicación
 st.title("Consulta Cierre 10 últimos días")
@@ -43,7 +46,7 @@ if prompt := st.chat_input("Pregunta"):
 
         with st.status("Consultando información ..." , expanded=True) as status:
                 
-            response = get_response(prompt)
+            response = get_response(prompt,st.session_state["thread_id"])
             st.session_state.chat_memory.add_ai_message(response)
         # Mostrar la respuesta
             with st.chat_message("assistant"):

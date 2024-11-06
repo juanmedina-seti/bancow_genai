@@ -23,6 +23,24 @@ load_dotenv()
 #engine = create_engine("sqlite:///data/sqlite/cierre.db")
 
 
+
+def obtener_datos_cierre_normativo() ->str:
+    """Retorna los datos del cierre normativo para todas las fechas disponibles específica en formato json
+        con los siguientes campos:
+               FECHA_CIERRE: fecha del cierre
+               FIN_BANDEJA4: fecha y hora de finalización del proceso bandeja 4
+               FIN_BANDEJA8: fecha y hora de finalización del proceso bandeja 8 que es igual a la finalización del cierre normativo
+        Args:
+            fecha_cierre: fecha de cierre, Opcional. 
+    """
+  
+    myurl = os.environ["RESUMEN_CIERE_NORMATIVO_URL"]+"?"+os.environ["AZURE_DATALAKE_GENAI_TOKEN"]
+    #myfile = urlopen(myurl)
+    context = requests.get(myurl).text
+    
+    
+    return context
+
 def obtener_datos_por_proceso_de_cierre() ->str:
     """Retorna los datos del proceso de cierre para todas las fechas disponibles específica en formato json
         con los siguientes campos:
@@ -89,14 +107,14 @@ system_message = """"Eres un asistente muy útil. Por favor entraga solamente la
             """
 
 memory = MemorySaver()
-config = {"configurable": {"thread_id": "1"}}
 
 agent_executor = create_react_agent(
     llm, tools=tools, state_modifier=system_message,debug=False, checkpointer=memory
 )
 
 
-def get_response(user_input):
+def get_response(user_input,thread_id):
+    config = {"configurable": {"thread_id": thread_id}}
     inputs = {"messages": [("user", user_input)]}
     response = agent_executor.invoke(inputs, config=config)
     for m in response["messages"]:
