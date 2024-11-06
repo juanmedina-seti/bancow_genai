@@ -111,7 +111,7 @@ memory = MemorySaver()
 agent_executor = create_react_agent(
     llm, tools=tools, state_modifier=system_message,debug=False, checkpointer=memory
 )
-print(memory.config_specs)
+
 
 def get_response(user_input,thread_id):
     config = {"configurable": {"thread_id": thread_id}}
