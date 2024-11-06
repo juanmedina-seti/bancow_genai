@@ -13,7 +13,7 @@ import os
 from dotenv import load_dotenv
 
 
-logging.basicConfig(filename='logs/app.log', level=logging.INFO)
+logging.basicConfig( level=logging.INFO)
 
 logging.info('cargando modulo')
 
@@ -41,8 +41,8 @@ def obtener_datos_cierre_normativo() ->str:
     
     return context
 
-def obtener_datos_por_proceso_de_cierre() ->str:
-    """Retorna los datos del proceso de cierre para todas las fechas disponibles específica en formato json
+def obtener_datos_cierre_comercial() ->str:
+    """Retorna los datos del proceso de cierre comercial para todas las fechas disponibles específica en formato json
         con los siguientes campos:
                FECHA_CIERRE: fecha del cierre
                DURACION_TOTAL: duración de todo el proceso de cierre de cada fecha
@@ -65,7 +65,7 @@ def obtener_datos_por_proceso_de_cierre() ->str:
 # funciones para ser invocadas por el modelo
 def obtener_datos_tareas_mayor_duracion_por_fecha(fecha_cierre:date) ->str:
     """Retorna los detalles las tareas con mayor duración no tienen información del cierre completo 
-    solamente de las 10 tareas de mayor duracion
+    solamente de las 10 tareas de mayor duracion del cierre comercial
         los datos disponibles enen formato json son:
                FECHA_CIERRE: fecha del cierre
                DURACION: duración de la tarea en ejecución
@@ -92,7 +92,7 @@ grop_model ="llama3-groq-70b-8192-tool-use-preview"
 
 llm = ChatGroq(model=grop_model, temperature=0,verbose=True)
 
-tools=[obtener_datos_por_proceso_de_cierre, obtener_datos_tareas_mayor_duracion_por_fecha]
+tools=[obtener_datos_cierre_comercial, obtener_datos_tareas_mayor_duracion_por_fecha, obtener_datos_cierre_normativo]
 
 
 
@@ -100,9 +100,9 @@ tools=[obtener_datos_por_proceso_de_cierre, obtener_datos_tareas_mayor_duracion_
 
 
 ## Configuración del agente
-system_message = """"Eres un asistente muy útil. Por favor entraga solamente la respuesta a la pregunta de manera concreta.
-              identifica primero si la pregunta es sobre todo el cierre o sobre las tareas de mayor duración para elegir la herramienta (tool) más adecuada
-              para responder sobre las tareas de mayor duración de una fecha especifica, primero valide si hay datos para esa fecha de cierre
+system_message = """"Eres un asistente muy útil y tienes acceso a la información de proceso de cierre comercial y cierre normativo.
+              cuando no especifiquen si preguntan sobre cierre comercial o normativo, asume que es cierre comercial.
+              por favor utiliza respuestas gerenciales y concisas
               Responde siempre en español
             """
 
@@ -111,7 +111,7 @@ memory = MemorySaver()
 agent_executor = create_react_agent(
     llm, tools=tools, state_modifier=system_message,debug=False, checkpointer=memory
 )
-
+print(memory.config_specs)
 
 def get_response(user_input,thread_id):
     config = {"configurable": {"thread_id": thread_id}}
@@ -130,13 +130,15 @@ def get_response(user_input,thread_id):
            
 
 def main():
+    config = {"configurable": {"thread_id": "1"}}
     user_input = ""
     while True:
         user_input=input("Ingrese la pregunta (/q para finalizar): \n")
         if user_input.startswith("/q"):
             break
-
+        
         inputs = {"messages": [("user", user_input)]}
+
         response = agent_executor.stream(inputs,config=config)
      #   print(type(response))
         for s in response:
