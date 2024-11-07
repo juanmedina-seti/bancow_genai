@@ -1,6 +1,7 @@
 from datetime import date
 import pandas as pd
 from langchain_groq  import ChatGroq
+from langchain_openai   import AzureChatOpenAI
 from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
 import logging
@@ -18,10 +19,6 @@ logging.basicConfig( level=logging.INFO)
 logging.info('cargando modulo')
 
 load_dotenv()
-
-#Conexión de base de datos
-#engine = create_engine("sqlite:///data/sqlite/cierre.db")
-
 
 
 def obtener_datos_cierre_normativo() ->str:
@@ -85,17 +82,15 @@ def obtener_datos_tareas_mayor_duracion_por_fecha(fecha_cierre:date) ->str:
 
 #### Configuración del modelo y herramientas
 
-#grop_model = "gemma-7b-it"  -- NO
-#grop_model ="mixtral-8x7b-32768"
-#
-grop_model ="llama3-groq-70b-8192-tool-use-preview"
 
-llm = ChatGroq(model=grop_model, temperature=0,verbose=True)
+#llm = ChatGroq(model=grop_model, temperature=0,verbose=True)
+llm= AzureChatOpenAI(
+    azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"]
+    ,azure_deployment= os.environ["AZURE_OPENAI_DEPLOYMENT"]
+    ,temperature=0
+    ,verbose=True)
 
 tools=[obtener_datos_cierre_comercial, obtener_datos_tareas_mayor_duracion_por_fecha, obtener_datos_cierre_normativo]
-
-
-
 
 
 
