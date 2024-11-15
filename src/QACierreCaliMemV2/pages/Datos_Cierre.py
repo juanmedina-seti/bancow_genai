@@ -9,8 +9,9 @@ import sys
 load_dotenv()
 
 sys.path.append(".")
-from src.QACierreCaliMemV2.agentDATALAKE import get_response
+from src.QACierreCaliMemV2.agentDATALAKE import get_response, df_cierre_comercial
 
+st.set_page_config(layout="wide")
 # Inicializar la memoria de chat
 if 'chat_memory' not in st.session_state:
     st.session_state.chat_memory = ChatMessageHistory()
@@ -19,8 +20,9 @@ if "thread_id" not in st.session_state:
     st.session_state["thread_id"] = str(uuid.uuid4())
 
 # Configuración de la aplicación
-st.title("Consulta Cierre 10 últimos días")
-
+st.title("Consulta Cierre 30 últimos días")
+st.divider()
+col1, col2 = st.columns([0.4,0.6])
 # Mostrar el historial de la conversación
 def display_chat(history: ChatMessageHistory):
     for message in history.messages:
@@ -32,28 +34,28 @@ def display_chat(history: ChatMessageHistory):
                 st.markdown(message.content)
             
 
+with col1:
+    df=df_cierre_comercial()
+    st.bar_chart(df,x="FECHA_CIERRE",y=["Duración Total","Duración Total Pausas"],stack=False, y_label="Duración (hrs)")
 
-# Área de entrada de texto
+with col2:
+    display_chat(st.session_state.chat_memory)
 
-display_chat(st.session_state.chat_memory)
+    if prompt := st.chat_input("Pregunta"):
+        if prompt:
+            # Obtener respuesta del modelo
+            st.session_state.chat_memory.add_user_message(prompt)
+            with st.chat_message("user"):
+                st.markdown(prompt)
 
-if prompt := st.chat_input("Pregunta"):
-    if prompt:
-        # Obtener respuesta del modelo
-        st.session_state.chat_memory.add_user_message(prompt)
-        with st.chat_message("user"):
-            st.markdown(prompt)
+            with st.status("Consultando información ..." , expanded=True) as status:
+                    
+                response = get_response(prompt,st.session_state["thread_id"])
+                st.session_state.chat_memory.add_ai_message(response)
+            # Mostrar la respuesta
+                with st.chat_message("assistant"):
+                    st.markdown(response) 
+                status.update(label="",state="complete")      
 
-        with st.status("Consultando información ..." , expanded=True) as status:
-                
-            response = get_response(prompt,st.session_state["thread_id"])
-            st.session_state.chat_memory.add_ai_message(response)
-        # Mostrar la respuesta
-            with st.chat_message("assistant"):
-                st.markdown(response) 
-            status.update(label="",state="complete")      
-
-        
+            
             # Limpiar el campo de entrada
-
-
