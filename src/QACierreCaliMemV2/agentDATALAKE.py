@@ -54,7 +54,7 @@ def obtener_datos_cierre_normativo() ->str:
 def df_cierre_comercial():
     #Leer archivo
     try:
-        myurl = os.environ["RESUMEN_CIERE_URL"]+"?"+os.environ["AZURE_DATALAKE_GENAI_TOKEN"]
+        myurl = os.environ["RESUMEN_CIERRE_URL"]+"?"+os.environ["AZURE_DATALAKE_GENAI_TOKEN"]
    
         response = requests.get(myurl)
         response.raise_for_status()

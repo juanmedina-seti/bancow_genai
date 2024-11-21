@@ -36,8 +36,8 @@ def display_chat(history: ChatMessageHistory):
 
 with col1:
     df=df_cierre_comercial()
-    st.bar_chart(df,x="FECHA_CIERRE",y=["Duración Total","Total Pausas"],stack=False, y_label="Duración (hrs)")
-    st.bar_chart(df,x="FECHA_CIERRE",y=["Sin Pausas","Total Pausas"],stack=True, y_label="Duración (hrs)")
+    st.bar_chart(df,x="FECHA_CIERRE",y=["Duración Total","Sin Pausas"],stack=False, y_label="Duración (hrs)")
+    #st.bar_chart(df,x="FECHA_CIERRE",y=["Sin Pausas","Total Pausas"],stack=True, y_label="Duración (hrs)")
 with col2:
     chat_container = st.container(height=500)
     with chat_container:
