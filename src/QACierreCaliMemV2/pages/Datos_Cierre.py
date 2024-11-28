@@ -22,7 +22,7 @@ if "thread_id" not in st.session_state:
 # Configuración de la aplicación
 st.title("Consulta Cierre 30 últimos días")
 st.divider()
-col1, col2 = st.columns([0.4,0.6],gap='medium')
+col1, col2 = st.columns([0.5,0.5],gap='medium')
 # Mostrar el historial de la conversación
 def display_chat(history: ChatMessageHistory):
     for message in history.messages:
