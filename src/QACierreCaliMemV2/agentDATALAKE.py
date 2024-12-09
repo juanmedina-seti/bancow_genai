@@ -173,6 +173,8 @@ def get_response(user_input,thread_id):
 
 def main():
     config = {"configurable": {"thread_id": "1"}}
+    df=df_cierre_comercial()
+    print(df.head(2))
     user_input = ""
     while True:
         user_input=input("Ingrese la pregunta (/q para finalizar): \n")
